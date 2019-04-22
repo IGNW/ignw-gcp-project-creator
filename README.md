@@ -1,6 +1,6 @@
-# Project Title
+# IGNW GCP Project Creator
 
-One Paragraph of project description goes here.  Include the motivation and scope of the project.
+Code that allows the automation of project creation on GCP
 
 ## Getting Started
 
