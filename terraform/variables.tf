@@ -15,13 +15,13 @@ projects.
 EOF
 }
 
-#variable "project_prefix" {
-#  type    = "string"
-#  default = "vault-"
-#  description = <<EOF
-#String value to prefix the generated project ID with.
-#EOF
-#}
+variable "project_id" {
+  type    = "string"
+  default = ""
+  description = <<EOF
+String value for random project_id.
+EOF
+}
 
 variable "billing_account" {
   type = "string"
@@ -35,4 +35,16 @@ variable "org_id" {
   description = <<EOF
 Organization ID.
 EOF
+}
+
+variable "service_account_iam_roles" {
+  type = "list"
+
+  default = [
+    "roles/billing.projectManager",
+    "roles/resourcemanager.folderAdmin",
+    "roles/resourcemanager.folderIamAdmin",
+    "roles/resourcemanager.projectCreator",
+    "roles/resourcemanager.projectIamAdmin",
+  ]
 }

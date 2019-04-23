@@ -8,8 +8,25 @@ provider "google" {
   project = "${var.project}"
 }
 
+# Generate a random id for the project - GCP projects must have globally
+# unique names
+resource "random_id" "random" {
+  prefix      = "${var.project_id}"
+  byte_length = "8"
+}
+
+# Create the project
+ #resource "google_project" "vault" {
+ #  name            = "${random_id.random.hex}"
+ #  project_id      = "${random_id.random.hex}"
+ #  org_id          = "${var.org_id}"
+ #  billing_account = "${var.billing_account}"
+ #}
+
 # Create the provisioner project
  resource "google_project" "provisioner-project" {
+   name = "provisioner-project"
+   project_id      = "${random_id.random.hex}"
    org_id          = "${var.org_id}"
    billing_account = "${var.billing_account}"
  }
