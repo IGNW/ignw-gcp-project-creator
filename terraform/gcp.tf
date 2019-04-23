@@ -31,11 +31,6 @@ resource "google_service_account" "provisioner-svc" {
   project      = "${google_project.provisioner-project.project_id}"
 }
 
-# Create provisioner service account key
-resource "google_service_account_key" "vault" {
-  service_account_id = "${google_service_account.provisioner-svc.name}"
-}
-
 # Add the service account to the project
 resource "google_project_iam_member" "service-account" {
   count   = "${length(var.service_account_iam_roles)}"
