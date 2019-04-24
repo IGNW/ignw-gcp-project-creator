@@ -46,12 +46,6 @@ Organization ID.
 EOF
 }
 
-resource "google_organization_iam_member" "binding" {
-  org_id = "943433058474"
-  role    = "roles/resourcemanager.projectCreator",
-  member  = "serviceAccount:tf-ignw-project-manager@ignw-terraform-admin.iam.gserviceaccount.com"
-}
-
 variable "service_account_iam_roles" {
   type = "list"
 
