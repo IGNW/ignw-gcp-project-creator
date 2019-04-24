@@ -46,6 +46,12 @@ Organization ID.
 EOF
 }
 
+resource "google_organization_iam_member" "binding" {
+  org_id = "943433058474"
+  role    = "roles/resourcemanager.projectCreator",
+  member  = "user:tomc@ignw.io"
+}
+
 variable "service_account_iam_roles" {
   type = "list"
 
@@ -53,7 +59,6 @@ variable "service_account_iam_roles" {
     "roles/billing.projectManager",
     "roles/resourcemanager.folderAdmin",
     "roles/resourcemanager.folderIamAdmin",
-    "roles/resourcemanager.projectCreator",
     "roles/resourcemanager.projectIamAdmin",
   ]
 }
