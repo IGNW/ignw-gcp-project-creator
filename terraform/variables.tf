@@ -57,8 +57,8 @@ variable "service_account_iam_roles" {
 
   default = [
     "roles/billing.projectManager",
-    "roles/resourcemanager.folderAdmin",
-    "roles/resourcemanager.folderIamAdmin",
+    #"roles/resourcemanager.folderAdmin",
+    #"roles/resourcemanager.folderIamAdmin",
     "roles/resourcemanager.projectIamAdmin",
   ]
 }
