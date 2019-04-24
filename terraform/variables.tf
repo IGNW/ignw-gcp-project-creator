@@ -15,6 +15,15 @@ projects.
 EOF
 }
 
+variable "project_prefix" {
+  type    = "string"
+  default = "provisioner-"
+
+  description = <<EOF
+String value to prefix the generated project ID with.
+EOF
+}
+
 variable "project_id" {
   type    = "string"
   default = ""

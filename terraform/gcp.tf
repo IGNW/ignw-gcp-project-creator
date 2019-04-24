@@ -11,17 +11,25 @@ provider "google" {
 # Generate a random id for the project - GCP projects must have globally
 # unique names
 resource "random_id" "random" {
-  prefix      = "${var.project_id}"
+  prefix      = "${var.project_prefix}"
   byte_length = "8"
 }
 
-# Create the provisioner project
+# Create the project
  resource "google_project" "provisioner-project" {
-   name = "provisioner-project"
+   name            = "${random_id.random.hex}"
    project_id      = "${random_id.random.hex}"
    org_id          = "${var.org_id}"
    billing_account = "${var.billing_account}"
  }
+
+# Create the provisioner project
+ #resource "google_project" "provisioner-project" {
+ #  name = "provisioner-project"
+ #  project_id      = "${random_id.random.dec}"
+ #  org_id          = "${var.org_id}"
+ #  billing_account = "${var.billing_account}"
+ #}
 ###############
 
 # Create the provisioner service account
