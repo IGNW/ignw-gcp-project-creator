@@ -40,7 +40,27 @@ resource "google_project_service" "cloud_resource_manager_api" {
   project = "${google_project.provisioner-project.project_id}"
   disable_on_destroy = false
 }
+# Google Service Management allows service producers to publish their services on Google Cloud
+resource "google_project_service" "service_management_api" {
+  service = "servicemanagement.googleapis.com"
+  project = "${google_project.provisioner-project.project_id}"
+  disable_on_destroy = false
+}
 
+# Google Service Management allows service producers to publish their services on Google Cloud
+resource "google_project_service" "iam_api" {
+  service = "iam.googleapis.com"
+  project = "${google_project.provisioner-project.project_id}"
+  disable_on_destroy = false
+}
+
+
+# Google Service Management allows service producers to publish their services on Google Cloud
+resource "google_project_service" "cloud_billing_api" {
+  service = "cloudbilling.googleapis.com"
+  project = "${google_project.provisioner-project.project_id}"
+  disable_on_destroy = false
+}
 
 # Create the provisioner service account
 resource "google_service_account" "provisioner-svc" {
