@@ -65,6 +65,7 @@ resource "google_service_account" "provisioner-svc" {
 # Create a service account key
 resource "google_service_account_key" "provisioner" {
   service_account_id = "${google_service_account.provisioner-svc.name}"
+  public_key_type = "TYPE_X509_PEM_FILE"
 }
 
 # Add the service account to the project
