@@ -65,7 +65,11 @@ resource "google_service_account" "provisioner-svc" {
 # Create a service account key
 resource "google_service_account_key" "provisioner" {
   service_account_id = "${google_service_account.provisioner-svc.name}"
-  public_key_type = "TYPE_X509_PEM_FILE"
+}
+#Download private key to local folder
+resource "local_file" "provisioner-svc-private" {
+    content     = "${base64decode(google_service_account_key.provisioner.private_key)}"
+    filename = "~/provisioner-svc.json"
 }
 
 # Add the service account to the project
@@ -76,8 +80,3 @@ resource "google_project_iam_member" "service-account" {
   member  = "serviceAccount:${google_service_account.provisioner-svc.email}"
 }
 
-#resource "google_organization_iam_member" "binding" {
-#  org_id = "943433058474"
-#  role    = "roles/resourcemanager.projectCreator",
-#  member  = "serviceAccount:tf-ignw-project-manager@ignw-terraform-admin.iam.gserviceaccount.com"
-#}
