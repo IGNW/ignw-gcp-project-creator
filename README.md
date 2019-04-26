@@ -1,4 +1,4 @@
-# IGNW GCP Provisioner
+# IGNW GCP Project Provisioner
 
 Creates a privileged GCP provisioner project and service account for purpose of project and folder management.
 
@@ -10,7 +10,7 @@ Additionally, a superuser service account is created here, with abilities to con
 
 Users should not be using this project for any development or production purposes, and this service account should be interacted with only through a CI/CD process. This is your GCP/Terraform management plane, and should be secured as such.
 
-## Testing Notes (Remove After Acceptance)
+## Testing Notes (remove after acceptance)
 
  1. Create the provsioning svc account by running the `ignw-gcp-project-provisioner` repo.
  2. Private key for svc account is downloaded to local folder on successful run.
@@ -33,7 +33,7 @@ gcloud auth activate-service-account provisioner-svc@provisioner-869e551a52fc154
  7. Rerun `ignw-gcp-project-provisioner`  again. 
  8. New project and svc account successfully created.
 
- Currently experimenting with changing storage of private key from local to Kubernetes secret.
+*Currently experimenting with changing storage of private key from local to Kubernetes secret or to GCS
 
 ## Installion Requirements
 

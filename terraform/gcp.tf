@@ -1,8 +1,6 @@
 terraform {
   required_version = ">= 0.11.11"
 }
-
-# This file contains all the interactions with Google Cloud
 provider "google" {
   region  = "${var.region}"
   project = "${var.project}"
@@ -53,7 +51,15 @@ resource "google_project_service" "cloud_billing_api" {
   disable_on_destroy = false
 }
 
+# Google Service Management allows service producers to publish their services on Google Cloud
+resource "google_project_service" "kubernetes_engine_api" {
+  service = "container.googleapis.com"
+  project = "${google_project.provisioner-project.project_id}"
+  disable_on_destroy = false
+}
+
 # END Enable APIs
+
 
 # Create the provisioner service account
 resource "google_service_account" "provisioner-svc" {
@@ -66,12 +72,15 @@ resource "google_service_account" "provisioner-svc" {
 resource "google_service_account_key" "provisioner" {
   service_account_id = "${google_service_account.provisioner-svc.name}"
 }
+
+
 #Download private key to local folder
 #resource "local_file" "provisioner-svc-private" {
 #    content     = "${base64decode(google_service_account_key.provisioner.private_key)}"
 #    filename = "~/provisioner-svc.json"
 #}
 
+# Pulls key json into Kubernetes secret
 resource "kubernetes_secret" "provisioner-svc-credentials" {
   metadata = {
     name = "provisioner-svc-credentials"
