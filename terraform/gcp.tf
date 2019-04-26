@@ -21,10 +21,6 @@ resource "random_id" "random" {
    project_id      = "${random_id.random.hex}"
    org_id          = "${var.org_id}"
    billing_account = "${var.billing_account}"
-   tags          = {
-    Name        = "Created By Terraform"
-    Environment = "development"
-  }
  }
 
 # Enable APIs
