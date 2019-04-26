@@ -12,9 +12,9 @@ Users should not be using this project for any development or production purpose
 
 ## Testing Notes (Remove After Acceptance)
 
- 1. Create the provsioning svc account by running the gcp provisioner repo.
+ 1. Create the provsioning svc account by running the `ignw-gcp-project-provisioner` repo.
  2. Private key for svc account is downloaded to local folder on successful run.
- 3. Change new key credential path in EXPORT var, e.g, export GOOGLE_CLOUD_KEYFILE_JSON=~path/to/provisioner-svc.json
+ 3. Change new key credential path in EXPORT var, e.g, export `GOOGLE_CLOUD_KEYFILE_JSON=~path/to/provisioner-svc.json`
  4. Log out of current gcloud identity:
 
 ```
@@ -30,7 +30,7 @@ gcloud auth activate-service-account provisioner-svc@provisioner-869e551a52fc154
 
 ```
  6. Kill local TF state file
- 7. Rerun IGNW-GCP-provisioner again. 
+ 7. Rerun `ignw-gcp-project-provisioner`  again. 
  8. New project and svc account successfully created.
 
  Currently experimenting with changing storage of private key from local to Kubernetes secret.
