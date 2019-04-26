@@ -67,9 +67,18 @@ resource "google_service_account_key" "provisioner" {
   service_account_id = "${google_service_account.provisioner-svc.name}"
 }
 #Download private key to local folder
-resource "local_file" "provisioner-svc-private" {
-    content     = "${base64decode(google_service_account_key.provisioner.private_key)}"
-    filename = "~/provisioner-svc.json"
+#resource "local_file" "provisioner-svc-private" {
+#    content     = "${base64decode(google_service_account_key.provisioner.private_key)}"
+#    filename = "~/provisioner-svc.json"
+#}
+
+resource "kubernetes_secret" "provisioner-svc-credentials" {
+  metadata = {
+    name = "provisioner-svc-credentials"
+  }
+  data {
+    credentials.json = "${base64decode(google_service_account_key.provisioner.private_key)}"
+  }
 }
 
 # Add the service account to the project
