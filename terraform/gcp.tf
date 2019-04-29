@@ -12,18 +12,10 @@ resource "random_id" "random" {
   prefix      = "${var.project_prefix}"
   byte_length = "8"
 }
-
-# Create the project
- resource "google_project" "provisioner-project" {
-   name            = "${random_id.random.hex}"
-   project_id      = "${random_id.random.hex}"
-   org_id          = "${var.org_id}"
-   billing_account = "${var.billing_account}"
- }
-
+# Create folder under existing folder (Development folder name, in this case "Internal IGNW Work")
  resource "google_folder" "provisioner" {
   display_name = "Provisioner"
-  parent     = "organizations/${var.org_id}"
+  parent     = "folders/${var.folder_id}" # folder name: Internal IGNW Work
 }
 
 # Enable APIs
@@ -71,11 +63,14 @@ resource "google_service_account" "provisioner-svc" {
   account_id   = "provisioner-svc"
   display_name = "provisioner-svc"
   project      = "${google_project.provisioner-project.project_id}"
+  folder
+
 }
 
 # Create a service account key
 resource "google_service_account_key" "provisioner" {
   service_account_id = "${google_service_account.provisioner-svc.name}"
+
 }
 
 # Pulls key json into Kubernetes secret
@@ -95,4 +90,4 @@ resource "google_project_iam_member" "service-account" {
   role    = "${element(var.service_account_iam_roles, count.index)}"
   member  = "serviceAccount:${google_service_account.provisioner-svc.email}"
 }
-
+*/
