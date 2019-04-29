@@ -46,13 +46,22 @@ Organization ID.
 EOF
 }
 
+
+variable "folder_id" {
+  type = "string"
+  default = "379554957262"
+  description = <<EOF
+Folder ID.
+EOF
+}
+
 variable "service_account_iam_roles" {
   type = "list"
 
   default = [
     "roles/billing.projectManager",
-    #"roles/resourcemanager.folderAdmin",
-    #"roles/resourcemanager.folderIamAdmin",
+    "roles/resourcemanager.folderAdmin",
+    "roles/resourcemanager.folderIamAdmin",
     "roles/resourcemanager.projectIamAdmin",
   ]
 }
