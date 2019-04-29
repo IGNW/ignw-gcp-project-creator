@@ -56,6 +56,8 @@ resource "google_project_service" "kubernetes_engine_api" {
   service = "container.googleapis.com"
   project = "${google_project.provisioner-project.project_id}"
   disable_on_destroy = false
+
+#Add Kubernetes API
 }
 
 # END Enable APIs
