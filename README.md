@@ -26,7 +26,7 @@ gcloud auth revoke tomc@ignw.io
 
 ```
  # Login to SDK with service account:
-gcloud auth activate-service-account provisioner-svc@provisioner-869e551a52fc154b.iam.gserviceaccount.com --key-file=/Users/TomC/provisioner-svc.json
+gcloud auth activate-service-account tf-ignw-project-manager@ignw-terraform-admin.iam.gserviceaccount.com --key-file=/Users/TomC/.config/gcloud/ignw-terraform-admin.json
 
 ```
  6. Kill local TF state file

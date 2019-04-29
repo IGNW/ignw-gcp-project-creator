@@ -1,0 +1,5 @@
+#Download private key to local folder
+#resource "local_file" "provisioner-svc-private" {
+#    content     = "${base64decode(google_service_account_key.provisioner.private_key)}"
+#    filename = "~/provisioner-svc.json"
+#}

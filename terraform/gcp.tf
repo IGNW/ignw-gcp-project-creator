@@ -21,6 +21,11 @@ resource "random_id" "random" {
    billing_account = "${var.billing_account}"
  }
 
+ resource "google_folder" "provisioner" {
+  display_name = "Provisioner"
+  parent     = "organizations/${var.org_id}"
+}
+
 # Enable APIs
 
 # Cloud Resource Manager API: Creates, reads, and updates metadata for Google Cloud Platform resource containers.
