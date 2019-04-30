@@ -46,10 +46,9 @@ Organization ID.
 EOF
 }
 
-
 variable "folder_id" {
   type = "string"
-  default = "379554957262"
+  default = 379554957262
   description = <<EOF
 Folder ID.
 EOF

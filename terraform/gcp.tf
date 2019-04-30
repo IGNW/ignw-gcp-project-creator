@@ -18,6 +18,14 @@ resource "random_id" "random" {
   parent     = "folders/${var.folder_id}" # folder name: Internal IGNW Work
 }
 
+# Create the Project under the the new Provisioner/ folder, Internal IGNW Work --> Provisioner
+resource "google_project" "provisioner-project" {
+   name            = "${random_id.random.hex}"
+   project_id      = "${random_id.random.hex}"
+  folder_id        = "${google_folder.provisioner.name}"
+}
+
+
 # Enable APIs
 
 # Cloud Resource Manager API: Creates, reads, and updates metadata for Google Cloud Platform resource containers.
@@ -63,10 +71,7 @@ resource "google_service_account" "provisioner-svc" {
   account_id   = "provisioner-svc"
   display_name = "provisioner-svc"
   project      = "${google_project.provisioner-project.project_id}"
-  folder
-
 }
-
 # Create a service account key
 resource "google_service_account_key" "provisioner" {
   service_account_id = "${google_service_account.provisioner-svc.name}"
@@ -78,16 +83,8 @@ resource "kubernetes_secret" "provisioner-svc-credentials" {
   metadata = {
     name = "provisioner-svc-credentials"
   }
+
   data {
     credentials.json = "${base64decode(google_service_account_key.provisioner.private_key)}"
   }
 }
-
-# Add the service account to the project
-resource "google_project_iam_member" "service-account" {
-  count   = "${length(var.service_account_iam_roles)}"
-  project = "${google_project.provisioner-project.project_id}"
-  role    = "${element(var.service_account_iam_roles, count.index)}"
-  member  = "serviceAccount:${google_service_account.provisioner-svc.email}"
-}
-*/
