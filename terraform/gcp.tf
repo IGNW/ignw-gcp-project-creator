@@ -14,7 +14,7 @@ resource "random_id" "random" {
 }
 # Create folder under existing folder (Development folder name, in this case "Internal IGNW Work")
  resource "google_folder" "provisioner" {
-  display_name = "Provisioner"
+  display_name = "provisioner"
   parent     = "folders/${var.folder_id}" # folder name: Internal IGNW Work
 }
 
@@ -28,42 +28,19 @@ resource "google_project" "provisioner-project" {
 
 # Enable APIs
 
-# Cloud Resource Manager API: Creates, reads, and updates metadata for Google Cloud Platform resource containers.
-resource "google_project_service" "cloud_resource_manager_api" {
-  service = "cloudresourcemanager.googleapis.com"
-  project = "${google_project.provisioner-project.project_id}"
+resource "google_project_services" "apis" {
+	project = "${google_project.provisioner-project.project_id}"
+
+	services = [
+		"cloudresourcemanager.googleapis.com",
+		"servicemanagement.googleapis.com.com",
+    "servicemanagement.googleapis.com.com",
+    "iam.googleapis.com",
+    "cloudbilling.googleapis.com",
+    "container.googleapis.com"
+	]
   disable_on_destroy = false
 }
-# Google Service Management allows service producers to publish their services on Google Cloud
-resource "google_project_service" "service_management_api" {
-  service = "servicemanagement.googleapis.com"
-  project = "${google_project.provisioner-project.project_id}"
-  disable_on_destroy = false
-}
-
-# Google Service Management allows service producers to publish their services on Google Cloud
-resource "google_project_service" "iam_api" {
-  service = "iam.googleapis.com"
-  project = "${google_project.provisioner-project.project_id}"
-  disable_on_destroy = false
-}
-
-
-# Google Service Management allows service producers to publish their services on Google Cloud
-resource "google_project_service" "cloud_billing_api" {
-  service = "cloudbilling.googleapis.com"
-  project = "${google_project.provisioner-project.project_id}"
-  disable_on_destroy = false
-}
-
-# Google Service Management allows service producers to publish their services on Google Cloud
-resource "google_project_service" "kubernetes_engine_api" {
-  service = "container.googleapis.com"
-  project = "${google_project.provisioner-project.project_id}"
-  disable_on_destroy = false
-}
-
-# END Enable APIs
 
 
 # Create the provisioner service account
