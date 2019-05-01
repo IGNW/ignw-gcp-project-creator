@@ -12,21 +12,15 @@ resource "random_id" "random" {
   prefix      = "${var.project_prefix}"
   byte_length = "8"
 }
-# Create folder under existing folder (Development folder name, in this case "Internal IGNW Work")
-#resource "google_folder" "provisioner" {
-# display_name = "provisioner"
-# parent     = "folders/${var.folder_id}" # folder name: Internal IGNW Work
-#
 
-# Create the Project under the the new Provisioner/ folder, Internal IGNW Work --> Provisioner
+# Create the Project 
 resource "google_project" "provisioner-project" {
    name            = "${random_id.random.hex}"
    project_id      = "${random_id.random.hex}"
-   org_id          = "943433058474"
+   org_id          = "${var.org_id}"
    billing_account = "${var.billing_account}"
-  # folder_id        = "${google_folder.provisioner.name}"
-}
 
+}
 
 # Enable APIs
 resource "google_project_services" "apis" {
@@ -37,11 +31,11 @@ resource "google_project_services" "apis" {
 		"servicemanagement.googleapis.com",
     "iam.googleapis.com",
     "cloudbilling.googleapis.com",
-    "container.googleapis.com"
+    "container.googleapis.com",
+    "cloudkms.googleapis.com",
 	]
   disable_on_destroy = false
 }
-
 
 # Create the provisioner service account
 resource "google_service_account" "provisioner-svc" {
@@ -49,19 +43,36 @@ resource "google_service_account" "provisioner-svc" {
   display_name = "provisioner-svc"
   project      = "${google_project.provisioner-project.project_id}"
 }
-# Create a service account key
-resource "google_service_account_key" "provisioner" {
-  service_account_id = "${google_service_account.provisioner-svc.name}"
 
+
+
+# Create Keyring:
+
+resource "google_kms_key_ring" "provisioner-ring" {
+  name     = "provisioner-ring"
+  location = "${var.region}"
+  project      = "${google_project.provisioner-project.project_id}"
 }
 
-# Pulls key json into Kubernetes secret
-resource "kubernetes_secret" "provisioner-svc-credentials" {
-  metadata = {
-    name = "private-key-for-provisioner"
-  }
+#Create Key
+resource "google_kms_crypto_key" "provisioner-key" {
+  name            = "provisioner-key"
+  #location        = "${var.region}"
+  key_ring        = "${google_kms_key_ring.provisioner-ring.self_link}"
+  rotation_period = "100000s"
 
-  data {
-    credentials.json = "${base64decode(google_service_account_key.provisioner.private_key)}"
+  lifecycle {
+    prevent_destroy = true
   }
 }
+
+resource "google_kms_crypto_key_iam_binding" "provisioner-key" {
+  crypto_key_id = "'${google_project.provisioner-project.project_id}''/''${var.region}''/provisioner-ring/provisioner-key_ring'"
+  role          = "roles/editor"
+
+  members = [
+    "serviceAccount:${google_service_account.provisioner-svc.name}"
+  ]
+}
+
+
