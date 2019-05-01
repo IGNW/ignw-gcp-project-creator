@@ -40,6 +40,7 @@ EOF
 }
 
 variable "org_id" {
+  default = "943433058474"
   type = "string"
   description = <<EOF
 Organization ID.

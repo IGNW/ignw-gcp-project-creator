@@ -13,28 +13,28 @@ resource "random_id" "random" {
   byte_length = "8"
 }
 # Create folder under existing folder (Development folder name, in this case "Internal IGNW Work")
- resource "google_folder" "provisioner" {
-  display_name = "provisioner"
-  parent     = "folders/${var.folder_id}" # folder name: Internal IGNW Work
-}
+#resource "google_folder" "provisioner" {
+# display_name = "provisioner"
+# parent     = "folders/${var.folder_id}" # folder name: Internal IGNW Work
+#
 
 # Create the Project under the the new Provisioner/ folder, Internal IGNW Work --> Provisioner
 resource "google_project" "provisioner-project" {
    name            = "${random_id.random.hex}"
    project_id      = "${random_id.random.hex}"
-  folder_id        = "${google_folder.provisioner.name}"
+   org_id          = "943433058474"
+   billing_account = "${var.billing_account}"
+  # folder_id        = "${google_folder.provisioner.name}"
 }
 
 
 # Enable APIs
-
 resource "google_project_services" "apis" {
 	project = "${google_project.provisioner-project.project_id}"
 
 	services = [
 		"cloudresourcemanager.googleapis.com",
-		"servicemanagement.googleapis.com.com",
-    "servicemanagement.googleapis.com.com",
+		"servicemanagement.googleapis.com",
     "iam.googleapis.com",
     "cloudbilling.googleapis.com",
     "container.googleapis.com"
@@ -58,7 +58,7 @@ resource "google_service_account_key" "provisioner" {
 # Pulls key json into Kubernetes secret
 resource "kubernetes_secret" "provisioner-svc-credentials" {
   metadata = {
-    name = "provisioner-svc-credentials"
+    name = "private-key-for-provisioner"
   }
 
   data {
