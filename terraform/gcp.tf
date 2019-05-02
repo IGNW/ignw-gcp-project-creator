@@ -59,6 +59,7 @@ resource "google_kms_key_ring" "provisioner-ring" {
   name     = "provisioner-ring"
   location = "${var.region}"
   project      = "${google_project.provisioner-project.project_id}"
+  depends_on   = ["google_service_account.provisioner-svc"]
 }
 
 #Create Key
@@ -67,6 +68,7 @@ resource "google_kms_crypto_key" "provisioner-key" {
   #location        = "${var.region}"
   key_ring        = "${google_kms_key_ring.provisioner-ring.self_link}"
   rotation_period = "100000s"
+  depends_on   = ["google_kms_key_ring.provisioner-ring"]
 
   lifecycle {
     prevent_destroy = false
@@ -86,4 +88,5 @@ resource "google_kms_crypto_key_iam_member" "provisioner-key" {
   crypto_key_id = "${google_project.provisioner-project.project_id}/${var.region}/provisioner-ring/provisioner-key"
   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
   member        = "serviceAccount:${google_service_account.provisioner-svc.name}"
+  depends_on   = ["google_kms_crypto_key.provisioner-key"]
   }
