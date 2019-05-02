@@ -1,5 +1,9 @@
 terraform {
   required_version = ">= 0.11.11"
+   backend "gcs" {
+    bucket  = "tf-state-dev2"
+    prefix  = "terraform/state"
+   }
 }
 provider "google" {
   region  = "${var.region}"
@@ -8,15 +12,15 @@ provider "google" {
 
 # Generate a random id for the project - GCP projects must have globally
 # unique names
-resource "random_id" "random" {
-  prefix      = "${var.project_prefix}"
-  byte_length = "8"
-}
+#resource "random_id" "random" {
+#  prefix      = "${var.project_prefix}"
+#  byte_length = "8"
+#}
 
 # Create the Project 
 resource "google_project" "provisioner-project" {
-   name            = "${random_id.random.hex}"
-   project_id      = "${random_id.random.hex}"
+   name            = "provisioner-tomc"
+   project_id      = "provisioner-tomc"
    org_id          = "${var.org_id}"
    billing_account = "${var.billing_account}"
 
