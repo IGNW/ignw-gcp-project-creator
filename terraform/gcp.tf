@@ -33,6 +33,7 @@ resource "google_project_services" "apis" {
     "cloudbilling.googleapis.com",
     "container.googleapis.com",
     "cloudkms.googleapis.com",
+    "compute.googleapis.com",
 	]
   disable_on_destroy = true
   depends_on   = ["google_project.provisioner-project"]
@@ -46,15 +47,13 @@ resource "google_service_account" "provisioner-svc" {
   depends_on   = ["google_project_services.apis"]
 }
 
-
-# Add the service account to the project
-resource "google_project_iam_member" "provisioner-svc" {
-  count   = "${length(var.service_account_iam_roles)}"
+# Add roles to provisioner acct  NOTE: # still needs "roles/resourcemanager.projectCreator" won't take array, requires single role
+resource "google_project_iam_member" "provisioner-project" {
   project = "${google_project.provisioner-project.project_id}"
-  role    = "${element(var.service_account_iam_roles, count.index)}"
-  member  = "serviceAccount:${google_service_account.provisioner-svc.name}"
-  depends_on   = ["google_service_account.provisioner-svc"]
+  role    = "roles/billing.projectManager"                    
+  member  = "serviceAccount:${google_service_account.provisioner-svc.email}"
 }
+
 
 # Create Keyring:
 
@@ -62,7 +61,7 @@ resource "google_kms_key_ring" "provisioner-ring" {
   name     = "provisioner-ring"
   location = "${var.region}"
   project      = "${google_project.provisioner-project.project_id}"
-  depends_on   = ["google_project_iam_member.provisioner-svc"]
+  depends_on   = ["google_project_iam_member.provisioner-project"]
 }
 
 #Create Key
@@ -80,36 +79,43 @@ resource "google_kms_crypto_key" "provisioner-key" {
 
 # Successfully executed
 
-/* 
+/*  TODO Convert to Terraform
 gcloud kms keys add-iam-policy-binding "provisioner-key" \
   --location us-west2 \
   --keyring provisioner-ring \
-  --member serviceAccount:provisioner-svc@provisioner-fae5d0670337b8e9.iam.gserviceaccount.com \
+  --member serviceAccount:provisioner-svc@provisioner-53f51230c855387b.iam.gserviceaccount.com \
   --role roles/cloudkms.cryptoKeyEncrypterDecrypter \
-  --project provisioner-fae5d0670337b8e9
+  --project provisioner-53f51230c855387b
   */
 
   # Successfully executed
-  
-  /*
-  gcloud beta container clusters create provisioner-cluster2 \
+  #Create Cluster #1
+  /* TODO Convert to Terraform; upgrade to #1.8.14-gke.0 possibly
+  gcloud beta container clusters create provisioner-cluster \
   --cluster-version=latest \
   --zone us-west2-a \
-  --database-encryption-key projects/provisioner-fae5d0670337b8e9/locations/us-west2/keyRings/provisioner-ring/cryptoKeys/provisioner-key \
-  --project provisioner-fae5d0670337b8e9
+  --database-encryption-key projects/provisioner-53f51230c855387b/locations/us-west2/keyRings/provisioner-ring/cryptoKeys/provisioner-key \
+  --project provisioner-53f51230c855387b
   */
 
 
+# Successfully Executed
 /*
 gcloud beta container clusters describe provisioner-cluster \
   --zone us-west2-a  \
   --format 'value(databaseEncryption)' \
-  --project provisioner-fae5d0670337b8e9
+  --project provisioner-53f51230c855387b
+
+output: keyName=projects/provisioner-53f51230c855387b/locations/us-west2/keyRings/provisioner-ring/cryptoKeys/provisioner-key;state=ENCRYPTED
+projects/provisioner-53f51230c855387b/locations/us-west2/keyRings/provisioner-ring/cryptoKeys/provisioner-key/cryptoKeyVersions/1
   */
 
 
 
 
+
+
+/*
 # --------------------------
 # PAST FAILURES
 
@@ -129,3 +135,35 @@ gcloud beta container clusters describe provisioner-cluster \
 #    "serviceAccount:${google_service_account.provisioner-svc.name}"
 #  ]
 #}
+
+
+resource "google_project_iam_policy" "project-provisioner" {
+  project      = "${google_project.provisioner-project.project_id}"
+  policy_data = "${data.google_iam_policy.provisioner-policy.policy_data}"
+}
+
+data "google_iam_policy" "provisioner-policy" {
+  binding {
+    role = "roles/billing.projectManager"
+
+    members = [
+      "serviceAccount: ${google_service_account.provisioner-svc.name}"
+    ]
+  }
+}
+
+
+
+# Add the service account to the project
+#resource "google_project_iam_member" "provisioner-svc" {
+#  count   = "${length(var.service_account_iam_roles)}"
+#  project = "${google_project.provisioner-project.project_id}"
+#  # role    = "${element(var.service_account_iam_roles, count.index)}"
+#  role    = "roles/billing.projectManager"
+#  member  = "serviceAccount: ${google_service_account.provisioner-svc.name}"
+#  depends_on   = ["google_service_account.provisioner-svc"]
+#}
+
+
+
+*/
