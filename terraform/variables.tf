@@ -63,6 +63,6 @@ variable "service_account_iam_roles" {
     "roles/resourcemanager.folderAdmin",
     "roles/resourcemanager.folderIamAdmin",
     "roles/resourcemanager.projectIamAdmin",
-    "roles/cloudkms.cryptoKeyEncrypterDecrypter",
+    #"roles/cloudkms.cryptoKeyEncrypterDecrypter",
   ]
 }

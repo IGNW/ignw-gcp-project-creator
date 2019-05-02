@@ -42,9 +42,16 @@ resource "google_service_account" "provisioner-svc" {
   account_id   = "provisioner-svc"
   display_name = "provisioner-svc"
   project      = "${google_project.provisioner-project.project_id}"
+  depends_on   = "${google_project_services.apis}"
 }
 
-
+# Add the service account to the project
+#resource "google_project_iam_member" "service-account" {
+#  count   = "${length(var.service_account_iam_roles)}"
+#  project = "${google_project.provisioner-project.project_id}"
+#  role    = "${element(var.service_account_iam_roles, count.index)}"
+#  member  = "serviceAccount:${google_service_account.provisioner-svc.name}"
+#}
 
 # Create Keyring:
 
@@ -62,17 +69,21 @@ resource "google_kms_crypto_key" "provisioner-key" {
   rotation_period = "100000s"
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
-resource "google_kms_crypto_key_iam_binding" "provisioner-key" {
-  crypto_key_id = "'${google_project.provisioner-project.project_id}''/''${var.region}''/provisioner-ring/provisioner-key_ring'"
-  role          = "roles/editor"
+#resource "google_kms_crypto_key_iam_binding" "provisioner-key" {
+#  crypto_key_id = "${google_project.provisioner-project.project_id}/${var.region}/provisioner-ring/provisioner-key"
+#  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+#
+#  members = [
+#    "serviceAccount:${google_service_account.provisioner-svc.name}"
+#  ]
+#}
 
-  members = [
-    "serviceAccount:${google_service_account.provisioner-svc.name}"
-  ]
-}
-
-
+resource "google_kms_crypto_key_iam_member" "provisioner-key" {
+  crypto_key_id = "${google_project.provisioner-project.project_id}/${var.region}/provisioner-ring/provisioner-key"
+  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  member        = "serviceAccount:${google_service_account.provisioner-svc.name}"
+  }
