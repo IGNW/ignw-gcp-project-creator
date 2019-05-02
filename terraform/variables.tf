@@ -6,6 +6,14 @@ Desired Region
 EOF
 }
 
+variable "zone" {
+  type    = "string"
+  default = "us-west2-a"
+  description = <<EOF
+Desired Region
+EOF
+}
+
 variable "project" {
   type    = "string"
   default = ""
@@ -63,6 +71,5 @@ variable "service_account_iam_roles" {
     "roles/resourcemanager.folderAdmin",
     "roles/resourcemanager.folderIamAdmin",
     "roles/resourcemanager.projectIamAdmin",
-    #"roles/cloudkms.cryptoKeyEncrypterDecrypter",
   ]
 }
