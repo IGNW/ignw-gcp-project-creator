@@ -42,7 +42,7 @@ resource "google_service_account" "provisioner-svc" {
   account_id   = "provisioner-svc"
   display_name = "provisioner-svc"
   project      = "${google_project.provisioner-project.project_id}"
-  depends_on   = "${google_project_services.apis}"
+  depends_on   = ["google_project_services.apis"]
 }
 
 # Add the service account to the project
