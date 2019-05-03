@@ -6,6 +6,14 @@ Desired Region
 EOF
 }
 
+variable "zone" {
+  type    = "string"
+  default = "us-west2-a"
+  description = <<EOF
+Desired Region
+EOF
+}
+
 variable "project" {
   type    = "string"
   default = ""
@@ -32,27 +40,36 @@ String value for random project_id.
 EOF
 }
 
-variable "billing_account" {
+variable "BILLING_ACCOUNT" {
   type = "string"
   description = <<EOF
 Billing account ID.
 EOF
 }
 
-variable "org_id" {
+variable "ORG_ID" {
+  default = "943433058474"
   type = "string"
   description = <<EOF
 Organization ID.
 EOF
 }
 
-variable "service_account_iam_roles" {
-  type = "list"
+#variable "folder_id" {
+#  type = "string"
+#  default = 379554957262
+#  description = <<EOF
+#Folder ID.
+#EOF
+#}
 
-  default = [
-    "roles/billing.projectManager",
-    #"roles/resourcemanager.folderAdmin",
-    #"roles/resourcemanager.folderIamAdmin",
-    "roles/resourcemanager.projectIamAdmin",
-  ]
-}
+# variable "service_account_iam_roles" {
+#   type = "list"
+# 
+#   default = [
+#     "roles/billing.projectManager",
+#     "roles/resourcemanager.folderAdmin",
+#     "roles/resourcemanager.folderIamAdmin",
+#     "roles/resourcemanager.projectCreator",
+#   ]
+# }

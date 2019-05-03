@@ -3,3 +3,252 @@
 #    content     = "${base64decode(google_service_account_key.provisioner.private_key)}"
 #    filename = "~/provisioner-svc.json"
 #}
+
+
+
+
+
+troubleshooting
+
+*
+# Create the Project under the the new Provisioner/ folder, Internal IGNW Work --> Provisioner
+resource "google_project" "provisioner-project" {
+   name            = "${random_id.random.hex}"
+   project_id      = "${random_id.random.hex}"
+  folder_id        = "${google_folder.provisioner.name}"
+}
+
+
+# Enable APIs
+
+# Cloud Resource Manager API: Creates, reads, and updates metadata for Google Cloud Platform resource containers.
+resource "google_project_service" "cloud_resource_manager_api" {
+  service = "cloudresourcemanager.googleapis.com"
+  project = "${google_project.provisioner-project.project_id}"
+  disable_on_destroy = false
+}
+# Google Service Management allows service producers to publish their services on Google Cloud
+resource "google_project_service" "service_management_api" {
+  service = "servicemanagement.googleapis.com"
+  project = "${google_project.provisioner-project.project_id}"
+  disable_on_destroy = false
+}
+
+# Google Service Management allows service producers to publish their services on Google Cloud
+resource "google_project_service" "iam_api" {
+  service = "iam.googleapis.com"
+  project = "${google_project.provisioner-project.project_id}"
+  disable_on_destroy = false
+}
+
+
+# Google Service Management allows service producers to publish their services on Google Cloud
+resource "google_project_service" "cloud_billing_api" {
+  service = "cloudbilling.googleapis.com"
+  project = "${google_project.provisioner-project.project_id}"
+  disable_on_destroy = false
+}
+
+# Google Service Management allows service producers to publish their services on Google Cloud
+resource "google_project_service" "kubernetes_engine_api" {
+  service = "container.googleapis.com"
+  project = "${google_project.provisioner-project.project_id}"
+  disable_on_destroy = false
+}
+
+# END Enable APIs
+
+
+# Create the provisioner service account
+resource "google_service_account" "provisioner-svc" {
+  account_id   = "provisioner-svc"
+  display_name = "provisioner-svc"
+  project      = "${google_project.provisioner-project.project_id}"
+  folder
+
+}
+
+# Create a service account key
+resource "google_service_account_key" "provisioner" {
+  service_account_id = "${google_service_account.provisioner-svc.name}"
+
+}
+
+# Pulls key json into Kubernetes secret
+resource "kubernetes_secret" "provisioner-svc-credentials" {
+  metadata = {
+    name = "provisioner-svc-credentials"
+  }
+  data {
+    credentials.json = "${base64decode(google_service_account_key.provisioner.private_key)}"
+  }
+}
+
+# Add the service account to the project
+resource "google_project_iam_member" "service-account" {
+  count   = "${length(var.service_account_iam_roles)}"
+  project = "${google_project.provisioner-project.project_id}"
+  role    = "${element(var.service_account_iam_roles, count.index)}"
+  member  = "serviceAccount:${google_service_account.provisioner-svc.email}"
+}
+*/
+
+
+gcloud kms keys add-iam-policy-binding "provisioner-key" \
+  --location us-west2 \
+  --keyring provisioner-ring \
+  --member serviceAccount:provisioner-svc@provisioner-66f06be8df9d2029.iam.gserviceaccount.com \
+  --role roles/cloudkms.cryptoKeyEncrypterDecrypter \
+  --project provisioner-66f06be8df9d2029
+
+
+  # Add the service account to the project
+#resource "google_project_iam_member" "service-account" {
+#  count   = "${length(var.service_account_iam_roles)}"
+#  project = "${google_project.provisioner-project.project_id}"
+#  role    = "${element(var.service_account_iam_roles, count.index)}"
+#  member  = "serviceAccount:${google_service_account.provisioner-svc.name}"
+
+
+
+resource "google_project_iam_policy" "project-provisioner" {
+  project      = "${google_project.provisioner-project.project_id}"
+  policy_data = "${data.google_iam_policy.provisioner-policy.policy_data}"
+}
+
+data "google_iam_policy" "provisioner-policy" {
+  binding {
+    role = "roles/billing.projectManager"
+
+    members = [
+      "serviceAccount: ${google_service_account.provisioner-svc.name}"
+    ]
+  }
+}
+}
+
+
+
+
+# Removed from project:
+
+# Successfully executed
+
+/*  TODO Convert to Terraform
+gcloud kms keys add-iam-policy-binding "provisioner-key" \
+  --location us-west2 \
+  --keyring provisioner-ring \
+  --member serviceAccount:provisioner-svc@provisioner-53f51230c855387b.iam.gserviceaccount.com \
+  --role roles/cloudkms.cryptoKeyEncrypterDecrypter \
+  --project provisioner-53f51230c855387b
+  */
+
+  # Successfully executed
+  #Create Cluster #1
+  /* TODO Convert to Terraform; upgrade to #1.8.14-gke.0 possibly
+  gcloud beta container clusters create provisioner-cluster \
+  --cluster-version=latest \
+  --zone us-west2-a \
+  --database-encryption-key projects/provisioner-53f51230c855387b/locations/us-west2/keyRings/provisioner-ring/cryptoKeys/provisioner-key \
+  --project provisioner-53f51230c855387b
+  */
+
+
+# Successfully Executed
+/*
+gcloud beta container clusters describe provisioner-cluster \
+  --zone us-west2-a  \
+  --format 'value(databaseEncryption)' \
+  --project provisioner-53f51230c855387b
+
+output: keyName=projects/provisioner-53f51230c855387b/locations/us-west2/keyRings/provisioner-ring/cryptoKeys/provisioner-key;state=ENCRYPTED
+projects/provisioner-53f51230c855387b/locations/us-west2/keyRings/provisioner-ring/cryptoKeys/provisioner-key/cryptoKeyVersions/1
+  */
+
+
+
+
+
+
+/*
+# --------------------------
+# PAST FAILURES
+
+#resource "google_kms_crypto_key_iam_member" "provisioner-key" {
+# crypto_key_id = "${google_project.provisioner-project.project_id}/${var.region}/provisioner-ring/provisioner-key"
+# #crypto_key_id = "provisioner-66f06be8df9d2029/us-west2/provisioner-ring/provisioner-key"
+# role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+# member        = "serviceAccount:${google_service_account.provisioner-svc.name}"
+# depends_on   = ["google_kms_crypto_key.provisioner-key"]
+# }
+
+#resource "google_kms_crypto_key_iam_binding" "provisioner-key" {
+#  crypto_key_id = "${google_project.provisioner-project.project_id}/${var.region}/provisioner-ring/provisioner-key"
+#  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+#
+#  members = [
+#    "serviceAccount:${google_service_account.provisioner-svc.name}"
+#  ]
+#}
+
+
+resource "google_project_iam_policy" "project-provisioner" {
+  project      = "${google_project.provisioner-project.project_id}"
+  policy_data = "${data.google_iam_policy.provisioner-policy.policy_data}"
+}
+
+data "google_iam_policy" "provisioner-policy" {
+  binding {
+    role = "roles/billing.projectManager"
+
+    members = [
+      "serviceAccount: ${google_service_account.provisioner-svc.name}"
+    ]
+  }
+}
+
+
+
+# Add the service account to the project
+#resource "google_project_iam_member" "provisioner-svc" {
+#  count   = "${length(var.service_account_iam_roles)}"
+#  project = "${google_project.provisioner-project.project_id}"
+#  # role    = "${element(var.service_account_iam_roles, count.index)}"
+#  role    = "roles/billing.projectManager"
+#  member  = "serviceAccount: ${google_service_account.provisioner-svc.name}"
+#  depends_on   = ["google_service_account.provisioner-svc"]
+#}
+
+# Generate a random id for the project - GCP projects must have globally
+# unique names
+#resource "random_id" "random" {
+#  prefix      = "${var.project_prefix}"
+#  byte_length = "8"
+#}
+
+*/
+
+## Testing Notes (remove after acceptance)
+
+ 1. Create the provsioning svc account by running the `ignw-gcp-project-provisioner` repo.
+ 2. Private key for svc account is downloaded to local folder on successful run.
+ 3. Change new key credential path in EXPORT var, e.g, export `GOOGLE_CLOUD_KEYFILE_JSON=~path/to/provisioner-svc.json`
+ 4. Log out of current gcloud identity:
+
+```
+# log out
+gcloud auth revoke tomc@ignw.io
+
+```
+ 5. Log in with new provisioner svc acct:
+
+```
+ # Login to SDK with service account:
+gcloud auth activate-service-account tf-ignw-project-manager@ignw-terraform-admin.iam.gserviceaccount.com --key-file=/Users/TomC/.config/gcloud/ignw-terraform-admin.json
+
+```
+ 6. Kill local TF state file
+ 7. Rerun `ignw-gcp-project-provisioner`  again. 
+ 8. New project and svc account successfully created.
+
+*Currently experimenting with changing storage of private key from local to Kubernetes secret or to GCS

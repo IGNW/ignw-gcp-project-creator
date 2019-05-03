@@ -1,44 +1,55 @@
 # IGNW GCP Project Provisioner
 
-Creates a privileged GCP provisioner project and service account for purpose of project and folder management.
-
-On a top level project, or within an individual project, It is strongly recommended to isolate project and folder management. This is because these resource types will require heightened service account privileges. In some cases even organization-level control. It is desired that very few administrators have access to such service accounts.
-
-When dealing with multi-tenancy, a “project of projects” pattern can really help organizations manage potential sprawl. In this model, we use a master project to drive the creation of all other projects within the account. 
-
-Additionally, a superuser service account is created here, with abilities to control organization-wide objects such as folders and projects and objects that need organizational approval, such as certain network changes. 
-
-Users should not be using this project for any development or production purposes, and this service account should be interacted with only through a CI/CD process. This is your GCP/Terraform management plane, and should be secured as such.
-
-## Testing Notes (remove after acceptance)
-
- 1. Create the provsioning svc account by running the `ignw-gcp-project-provisioner` repo.
- 2. Private key for svc account is downloaded to local folder on successful run.
- 3. Change new key credential path in EXPORT var, e.g, export `GOOGLE_CLOUD_KEYFILE_JSON=~path/to/provisioner-svc.json`
- 4. Log out of current gcloud identity:
-
-```
-# log out
-gcloud auth revoke tomc@ignw.io
-
-```
- 5. Log in with new provisioner svc acct:
-
-```
- # Login to SDK with service account:
-gcloud auth activate-service-account tf-ignw-project-manager@ignw-terraform-admin.iam.gserviceaccount.com --key-file=/Users/TomC/.config/gcloud/ignw-terraform-admin.json
-
-```
- 6. Kill local TF state file
- 7. Rerun `ignw-gcp-project-provisioner`  again. 
- 8. New project and svc account successfully created.
-
-*Currently experimenting with changing storage of private key from local to Kubernetes secret or to GCS
+Creates a privileged service account and key for purpose of project admin. Private and public keys are encrypted at-rest in remote state GCS bucket.
 
 ## Installion Requirements
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+1. An empty project must be created before the initial Terrform run.
+2. Remote state bucket must created inside empty project before initial Terrafom run. In the example below, `provisioner-project0` is the name of your pre-created project. Create the bucket in this project.
+3. In the Terraform code, alter the GCS bucket backend value to the name of the bucket in Step #2.
 
-## Deployment
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Example:
+
+```
+terraform {
+  required_version = ">= 0.11.11"
+   backend "gcs" {
+    bucket  = "tf-state-dev-twc"
+    prefix  = "terraform/state"
+    project = "provisioner-project0"
+   }
+}
+
+```
+4. Alter the project name if desired.
+
+5. Terraform and GCP Cloud SDK must be installed
+
+
+
+## Deployment 
+
+Runners have been supplied to plan, apply, trace, and destroy for this repo. They are:
+
+* `plan_runner.sh`
+* `apply_runner.sh`
+* `trace_runner.sh`
+* `trace_runner.sh`
+
+You will need to change the two vars in each runner to your GCP organization ID and billing account ID.
+
+* TF_VAR_ORG_ID
+* TF_VAR_BILLING_ACCOUNT
+
+Example:
+
+```
+#!/usr/bin/env bash
+
+cd terraform
+terraform init
+TF_VAR_ORG_ID=<value here> TF_VAR_BILLING_ACCOUNT=<value here> terraform plan
+
+
+```

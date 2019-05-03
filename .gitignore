@@ -1,0 +1,10 @@
+terraform/terraform.log
+terraform/.terraform/plugins/darwin_amd64/terraform-provider-google_v2.5.1_x4
+terraform/.terraform/plugins/darwin_amd64/terraform-provider-kubernetes_v1.6.2_x4
+terraform/.terraform/plugins/darwin_amd64/terraform-provider-random_v2.1.1_x4
+scratch.txt
+terraform/.terraform/plugins/darwin_amd64/terraform-provider-local_v1.2.1_x4
+terraform/.terraform/plugins/darwin_amd64/lock.json
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/terraform.tfstate
