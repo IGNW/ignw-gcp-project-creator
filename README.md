@@ -1,6 +1,6 @@
 # IGNW GCP Project Provisioner
 
-Creates a privileged service account and key for purpose of project admin. Private key is encrypted at-rest in remote state GCS bucket.
+Creates a privileged service account and key for purpose of project admin. Private and public keys are encrypted at-rest in remote state GCS bucket.
 
 ## Installion Requirements
 
