@@ -17,8 +17,8 @@ provider "google" {
 resource "google_project" "provisioner-project0" {
    name            = "provisioner-poc1"
    project_id      = "provisioner-poc1"
-   org_id          = "${var.org_id}"
-   billing_account = "${var.billing_account}"
+   org_id          = "${var.ORG_ID}"
+   billing_account = "${var.BILLING_ACCOUNT}"
 
 }
 

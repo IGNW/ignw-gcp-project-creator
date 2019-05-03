@@ -1,33 +1,6 @@
 # IGNW GCP Project Provisioner
 
-Creates a privileged GCP provisioner project and service account for purpose of project and folder management.
-
-
-
-## Testing Notes (remove after acceptance)
-
- 1. Create the provsioning svc account by running the `ignw-gcp-project-provisioner` repo.
- 2. Private key for svc account is downloaded to local folder on successful run.
- 3. Change new key credential path in EXPORT var, e.g, export `GOOGLE_CLOUD_KEYFILE_JSON=~path/to/provisioner-svc.json`
- 4. Log out of current gcloud identity:
-
-```
-# log out
-gcloud auth revoke tomc@ignw.io
-
-```
- 5. Log in with new provisioner svc acct:
-
-```
- # Login to SDK with service account:
-gcloud auth activate-service-account tf-ignw-project-manager@ignw-terraform-admin.iam.gserviceaccount.com --key-file=/Users/TomC/.config/gcloud/ignw-terraform-admin.json
-
-```
- 6. Kill local TF state file
- 7. Rerun `ignw-gcp-project-provisioner`  again. 
- 8. New project and svc account successfully created.
-
-*Currently experimenting with changing storage of private key from local to Kubernetes secret or to GCS
+Creates a privileged service account and key for purpose of project admin. Private key is rendered in remote state.
 
 ## Installion Requirements
 
@@ -45,7 +18,34 @@ terraform {
    }
 }
 
-```
-## Deployment
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+```
+4. Terraform and GCPCloud SDK installed
+
+
+
+## Deployment 
+
+Runners have been supplied to plan, apply, trace, and destroy for this repo. They are:
+
+* plan_runner.sh
+* apply_runner.sh
+* trace_runner.sh
+* trace_runner.sh
+
+You will need to change the two vars in each runner to your GCP organizationID and billing account you want the project billed to.
+
+* TF_VAR_ORG_ID
+* TF_VAR_BILLING_ACCOUNT
+
+Example:
+
+```
+#!/usr/bin/env bash
+
+cd terraform
+terraform init
+TF_VAR_ORG_ID=<value here> TF_VAR_BILLING_ACCOUNT=<value here> terraform plan
+
+
+```

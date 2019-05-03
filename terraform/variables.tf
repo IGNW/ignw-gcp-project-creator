@@ -40,14 +40,14 @@ String value for random project_id.
 EOF
 }
 
-variable "billing_account" {
+variable "BILLING_ACCOUNT" {
   type = "string"
   description = <<EOF
 Billing account ID.
 EOF
 }
 
-variable "org_id" {
+variable "ORG_ID" {
   default = "943433058474"
   type = "string"
   description = <<EOF
