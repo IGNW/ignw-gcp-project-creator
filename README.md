@@ -5,7 +5,7 @@ Creates a privileged service account and key for purpose of project admin. Priva
 ## Installion Requirements
 
 1. An empty project must be created before the initial Terrform run.
-2. Remote state bucket must created inside empty project before initial Terrafom run. In the example below, `provisioner-project0` is the name of your pre-created project.
+2. Remote state bucket must created inside empty project before initial Terrafom run. In the example below, `provisioner-project0` is the name of your pre-created project. Create the bucket in this project.
 3. In the Terraform code, alter the GCS bucket backend value to the name of the bucket in Step #2.
 
 
