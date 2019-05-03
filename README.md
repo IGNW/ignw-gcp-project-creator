@@ -1,12 +1,15 @@
 # IGNW GCP Project Provisioner
 
-Creates a privileged service account and key for purpose of project admin. Private key is rendered in remote state.
+Creates a privileged service account and key for purpose of project admin. Private key is encrypted at-rest in remote state GCS bucket.
 
 ## Installion Requirements
 
-1. An empty project must be created before TF run.
-2. Remote state bucket must created inside empty project before TF run. In the example below, `provisioner-project0` is the name of your pre-created project.
-3. Inside the new project, GCS bucket must be named with the value in `bucket=`
+1. An empty project must be created before the initial Terrform run.
+2. Remote state bucket must created inside empty project before initial Terrafom run. In the example below, `provisioner-project0` is the name of your pre-created project.
+3. In the Terraform code, alter the GCS bucket backend value to the name of the bucket in Step #2.
+
+
+Example:
 
 ```
 terraform {
@@ -18,9 +21,10 @@ terraform {
    }
 }
 
-
 ```
-4. Terraform and GCPCloud SDK installed
+4. Alter the project name if desired.
+
+5. Terraform and GCP Cloud SDK must be installed
 
 
 
@@ -33,7 +37,7 @@ Runners have been supplied to plan, apply, trace, and destroy for this repo. The
 * trace_runner.sh
 * trace_runner.sh
 
-You will need to change the two vars in each runner to your GCP organizationID and billing account you want the project billed to.
+You will need to change the two vars in each runner to your GCP organization ID and billing account ID.
 
 * TF_VAR_ORG_ID
 * TF_VAR_BILLING_ACCOUNT
