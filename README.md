@@ -32,10 +32,10 @@ terraform {
 
 Runners have been supplied to plan, apply, trace, and destroy for this repo. They are:
 
-* plan_runner.sh
-* apply_runner.sh
-* trace_runner.sh
-* trace_runner.sh
+* `plan_runner.sh`
+* `apply_runner.sh`
+* `trace_runner.sh`
+* `trace_runner.sh`
 
 You will need to change the two vars in each runner to your GCP organization ID and billing account ID.
 
