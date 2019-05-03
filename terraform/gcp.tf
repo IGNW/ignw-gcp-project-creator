@@ -15,8 +15,8 @@ provider "google" {
 
 # Create the Project 
 resource "google_project" "provisioner-project0" {
-   name            = "provisioner-poc1"
-   project_id      = "provisioner-poc1"
+   name            = "provisioner-poc0"
+   project_id      = "provisioner-poc0"
    org_id          = "${var.ORG_ID}"
    billing_account = "${var.BILLING_ACCOUNT}"
 
@@ -58,26 +58,5 @@ resource "google_project_iam_member" "provisioner-project0" {
   member  = "serviceAccount:${google_service_account.provisioner-svc.email}"
 }
 
-
-# Create Keyring:
-
-#resource "google_kms_key_ring" "provisioner-ring" {
-#  name     = "provisioner-ring"
-#  location = "${var.region}"
-#  project      = "${google_project.provisioner-project0.project_id}"
-#  depends_on   = ["google_project_iam_member.provisioner-project0"]
-#}
-#
-##Create Key
-#resource "google_kms_crypto_key" "provisioner-key" {
-#  name            = "provisioner-key"
-#  #location        = "${var.region}"
-#  key_ring        = "${google_kms_key_ring.provisioner-ring.self_link}"
-#  depends_on   = ["google_kms_key_ring.provisioner-ring"]
-#
-#  lifecycle {
-#    prevent_destroy = false
-#  }
-#}
 
 
