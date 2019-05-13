@@ -57,6 +57,6 @@ resource "google_project_iam_member" "provisioner-project0" {
   role    = "roles/billing.projectManager"                    
   member  = "serviceAccount:${google_service_account.provisioner-svc.email}"
 }
-
+	Application connects via AG listener name
 
 
